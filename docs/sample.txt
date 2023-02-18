@@ -1,0 +1,80 @@
+import json
+import os
+import warnings
+
+from dotenv import load_dotenv
+from elasticsearch import Elasticsearch, helpers
+
+warnings.filterwarnings("ignore")
+load_dotenv(override=True)
+
+def gendata(data, index):
+    for doc in data:
+        yield {
+            "_index": index,
+            "_op_type": "create",
+            "_id": doc['_id'],
+            "doc": doc,
+        }
+
+def main():
+    try: 
+        url = f"{os.getenv('DEPLOYMENT')}:443"
+        client_remote = Elasticsearch(
+            # cloud_id=os.getenv("CLOUD_ID"),
+            url,
+            basic_auth=(os.getenv('USERNAME'), os.getenv("PASSWORD"))
+        )
+    except Exception as err:
+        print("Elasticsearch client ERROR: ", err)
+        client_remote = None
+    
+    try:
+        client_local = Elasticsearch("http://localhost:9200")
+    except Exception as err:
+        print("Unable to connect to local Elasticsearch db: ", err)
+        client_local = None
+
+    if client_remote != None and client_local != None:
+        print(client_local.info())
+        print(client_remote.info())
+        
+        local_indices = client_local.indices.get_alias(index="*")
+        remote_indices = client_remote.indices.get_alias(index="*")
+
+        local_client_docs = client_local.search(index="market-data")
+        remote_client_docs = client_remote.search(index="kibana_sample_data_ecommerce")
+        # print(remote_client_docs)
+
+        
+
+        # get all docs from remote using scan 
+        remote_docs = helpers.scan(client=client_remote, index="kibana_sample_data_ecommerce", query={"query": {"match_all": {}}})
+        
+
+        # use bulk to index or create into local
+        helpers.bulk(client=client_local, actions=gendata(remote_docs, 'market-data'), raise_on_error=False)
+    
+        # try deleting all docs in local, then rerun bulk 
+        #// query = {
+        #//     "source": {
+        #//         "remote": {
+        #//             "host": f"{os.getenv('DEPLOYMENT')}:443",
+        #//             "username": os.getenv("USERNAME"),
+        #//             "password": os.getenv("PASSWORD"),
+        #//         },
+        #//         "index": "kinbankibana_sample_data_ecommerce"
+        #//     }, 
+        #//     "dest": {
+        #//         "index": "market-data"
+        #//     }
+        #// }
+        #// client_local.reindex(body=query, wait_for_completion=True, conflicts='proceed')
+
+        
+
+        # print(remote_client_docs)
+        print('local client: ', local_client_docs['hits']['total']['value'])
+        print('remote client: ', remote_client_docs['hits']['total']['value'])
+if __name__ == "__main__":
+    main()

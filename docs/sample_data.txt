@@ -1,0 +1,7 @@
+green open .ds-logs-enterprise_search.api-default-2023.02.07-000001   7v6EBe4wSKSgsOZaONYhiw 1 1 2 0    63kb  31.5kb
+green open .ds-logs-enterprise_search.audit-default-2023.02.07-000001 0bvUXnfKSFK7J0yUHhRogg 1 1 9 0 206.5kb 125.4kb
+green open .elastic-connectors-sync-jobs-v1                           r9VNxI8IQVyl6urwUulGhw 1 1 0 0    450b    225b
+green open .elastic-connectors-v1                                     whFYJJDjR4iKUjdiB0lNJQ 1 1 0 0    450b    225b
+
+
+index > Field > Document
