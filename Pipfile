@@ -8,6 +8,7 @@ elasticsearch = "*"
 elastic-enterprise-search = "*"
 
 [dev-packages]
+ipykernel = "*"
 
 [requires]
 python_version = "3.9"
