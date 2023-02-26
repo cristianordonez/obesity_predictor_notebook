@@ -23,3 +23,7 @@ pipenv run python main.py
 - compare the two
 
 NOTE: env files are being cached
+
+# Resources
+
+- https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6710633/
